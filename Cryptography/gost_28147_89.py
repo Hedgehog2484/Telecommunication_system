@@ -17,7 +17,7 @@ class Gost_replacement:
         """
         text_lenght = int.from_bytes(plain_text, byteorder="big").bit_length()  # Считаем длину открытого текста.
         if text_lenght % 64 != 0:
-            plain_text += b" " * ((64 - text_lenght % 64) // 8)
+            plain_text += b"\xf0" * ((64 - text_lenght % 64) // 8)
         blocks_list = []
         block = b""
         for byte in plain_text:
@@ -32,7 +32,6 @@ class Gost_replacement:
         Разбивает 256-битный ключ на 8 подключей и возвращает их списком.
         :return: Список подключей.
         """
-        """Возвращает список состоящий из 8-ми 32-битных подключей."""
         return [(self.key >> (32 * i)) & 0xFFFFFFFF for i in range(8)]  # Разбиение ключа на 8 подключей.
 
     def f(self, text_part: int, subkey: int) -> int:
@@ -88,4 +87,3 @@ class Gost_replacement:
             left_part = right_part ^ self.f(left_part, subkeys[(7 - i) % 8])
             right_part = temp_var
         return (left_part << 32) | right_part  # Возвращаем блок расшифрованного сообщения.
-
