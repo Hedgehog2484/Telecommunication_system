@@ -17,14 +17,14 @@ class Gost_replacement:
         """
         text_lenght = int.from_bytes(plain_text, byteorder="big").bit_length()  # Считаем длину открытого текста.
         if text_lenght % 64 != 0:
-            plain_text += b"\xf0" * ((64 - text_lenght % 64) // 8)
+            plain_text += b"\x01" * (64 - text_lenght % 64)
         blocks_list = []
         block = b""
         for byte in plain_text:
             if len(block) * 8 == 64:
                 blocks_list.append(block)
                 block = b""
-            block += byte.to_bytes(2, byteorder="big")
+            block += byte.to_bytes((max(byte.bit_length(), 1) + 7) // 8, byteorder="big")
         return blocks_list
 
     def get_subkeys(self) -> List[int]:
