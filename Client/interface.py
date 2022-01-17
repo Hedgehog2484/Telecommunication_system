@@ -1,8 +1,10 @@
 import socket
-from tkinter import Tk, BOTH, Label, Entry, StringVar, BooleanVar, Radiobutton, IntVar, DISABLED
+from tkinter import Tk, Label, Entry, StringVar, Radiobutton, IntVar
 from tkinter.ttk import Frame, Button, Style
+import tkinter.messagebox as mb
 from tkinter import filedialog as fd
 
+from Cryptography import Gost_replacement
 from client import Client
 
 
@@ -75,12 +77,15 @@ class UI(Frame):
         if checked_radio_button == 0 and self.filepath != "" and self.server_ip.get() != "":
             # Отправка файла:
             with socket.create_connection((self.server_ip.get(), 9191)) as connection:
-                self.client_obj.send_file(connection, self.gost_obj)
+                self.client_obj.send_file(connection, self.gost_obj, self.filepath)
+                mb.showinfo("Info", "Файл отправлен!")
+
 
         elif checked_radio_button == 1 and self.server_ip.get() != "":
-            # Получение файлов:
+            # Получение файла:
             with socket.create_connection((self.server_ip.get(), 9191)) as connection:
                 self.client_obj.download_file(connection, self.gost_obj)
+                mb.showinfo("Info", "Файл получен!")
 
     def select_file(self):
         filepath = fd.askopenfilename(
